@@ -20,7 +20,6 @@
       <artifactId>postgresql</artifactId>
       <version>42.5.1</version>
     </dependency>
-
   </dependencies>
   <build>
     <finalName>Course3_JDBC</finalName>
