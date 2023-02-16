@@ -1,43 +1,43 @@
+import dao.EmployeeDao;
+import dao.EmployeeDaoImpl;
+import model.City;
+import model.Employee;
+
 import java.sql.*;
+import java.util.List;
+
 public class Application {
 
     public static void main(String[] args) throws SQLException {
 
-        // Создаем переменные с данными для подключения к базе
         final String user = "postgres";
         final String password = "woodoo1992";
         final String url = "jdbc:postgresql://localhost:5432/skypro";
 
-        // Создаем соединение с базой с помощью Connection
-        // Формируем запрос к базе с помощью PreparedStatement
-        try (final Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM employee WHERE id = (?)")) {
+        try (final Connection connection = DriverManager.getConnection(url, user, password)) {
 
-            // Подставляем значение вместо wildcard
-            statement.setInt(1, 1);
+            EmployeeDao employeeDao = new EmployeeDaoImpl(connection);
 
-            // Делаем запрос к базе и результат кладем в ResultSet
-            final ResultSet resultSet = statement.executeQuery();
+            // Добавление объекта
+            Employee pupkin = new Employee(7, "Egor", "Pupkin", "male", 77, 6);
+            City minsk = new City(7, "Minsk");
+            employeeDao.create(pupkin);
 
-            // Методом next проверяем есть ли следующий элемент в resultSet
-            // и одновременно переходим к нему, если таковой есть
-            while (resultSet.next()) {
+            // Получение объекта по id
+            System.out.println(employeeDao.readById(1));
 
-                // С помощью методов getInt и getString получаем данные из resultSet
-                String firstNameInEmployee = "First name: " + resultSet.getString("first_name");
-                String lastNameInEmployee = "Last name: " + resultSet.getString("last_name");
-                String genderInEmployee = "Gender: " + resultSet.getString("gender");
-                int ageInEmployee = resultSet.getInt("age");
-                int cityIdInEmployee = resultSet.getInt(6);
+            // Изменение объекта по id
+            employeeDao.updateEmployeeById(3, "Dmitriy", "Petrov", "male", 33, 7);
 
-                // Выводим данные в консоль
-                System.out.println(firstNameInEmployee);
-                System.out.println(lastNameInEmployee);
-                System.out.println(genderInEmployee);
-                System.out.println("Age: " + ageInEmployee);
-                System.out.println("City id: " + cityIdInEmployee);
+            // Удаление объекта по id
+            employeeDao.deleteById(11);
 
+            // Получение всех объектов
+            List<Employee> employees = employeeDao.readAll();
+            for (Employee employee : employees) {
+                System.out.println(employee);
             }
         }
     }
 }
+
