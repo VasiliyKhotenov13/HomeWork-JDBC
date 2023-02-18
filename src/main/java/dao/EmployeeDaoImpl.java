@@ -2,7 +2,6 @@ package dao;
 
 import model.Employee;
 
-import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +18,7 @@ public class EmployeeDaoImpl implements EmployeeDao {
     }
 
     @Override
-    public void create(Employee employee) {
+    public void create(Employee employee) throws SQLException {
 
         try (PreparedStatement statement = connection.prepareStatement(Queries.INSERT.query)) {
 
@@ -29,19 +28,18 @@ public class EmployeeDaoImpl implements EmployeeDao {
             statement.setInt(4, employee.getAge());
             statement.setInt(5, employee.getCityId());
 
-            statement.executeQuery();
+            statement.executeUpdate();
 
         } catch (SQLException e) {
+            throw new SQLException("Невозможно создать нового сотрудника.");
         }
 
     }
 
     @Override
-    public Employee readById(int id) {
+    public Employee readById(int id) throws SQLException {
 
-        String sql = "SELECT * FROM employee WHERE id = ?";
-
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(Queries.READ.query)) {
 
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -55,12 +53,13 @@ public class EmployeeDaoImpl implements EmployeeDao {
                 return new Employee(id, firstName, lastName, gender, age, cityId);
             }
         } catch (SQLException e) {
+            throw new SQLException("Невозможно найти объект по запросу.");
         }
         return  null;
     }
 
     @Override
-    public List<Employee> readAll() {
+    public List<Employee> readAll() throws SQLException {
 
         List<Employee> employees = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(Queries.GET_ALL.query)) {
@@ -78,12 +77,14 @@ public class EmployeeDaoImpl implements EmployeeDao {
                 employees.add(new Employee(id, firstName, lastName, gender, age, cityId));
             }
         } catch (SQLException e) {
+            throw new SQLException("Невозможно вывести весь список сотрудников.");
         }
         return employees;
     }
 
     @Override
-    public void updateEmployeeById(int id, String firstName, String lastName, String gender, int age, int cityId) {
+    public void updateEmployeeById(int id, String firstName, String lastName,
+                                   String gender, int age, int cityId) throws SQLException {
 
         try (PreparedStatement statement = connection.prepareStatement(Queries.UPDATE.query)) {
 
@@ -96,17 +97,19 @@ public class EmployeeDaoImpl implements EmployeeDao {
 
             statement.executeQuery();
         } catch (SQLException e) {
+            throw new SQLException("Невозможно найти объект по запросу.");
         }
     }
 
     @Override
-    public void deleteById(int id) {
+    public void deleteById(int id) throws SQLException {
 
         try (PreparedStatement statement = connection.prepareStatement(Queries.DELETE.query)) {
 
             statement.setInt(1, id);
-            statement.executeQuery();
+            statement.executeUpdate();
         } catch (SQLException e) {
+            throw new SQLException("Невозможно удалить сотрудника.");
         }
     }
 
@@ -115,9 +118,10 @@ public class EmployeeDaoImpl implements EmployeeDao {
         GET_ALL("SELECT * FROM employee INNER JOIN city ON employee.city_id=city.city_id"),
         INSERT("INSERT INTO employee(first_name, last_name, gender, age, city_id) VALUES ((?), (?), (?), (?), (?))"),
         DELETE("DELETE FROM employee WHERE id=(?)"),
-        UPDATE("UPDATE employee SET first_name=?, last_name=?, gender=?, age=?, city_id=? WHERE id=?");
+        UPDATE("UPDATE employee SET first_name=(?), last_name=(?), gender=(?), age=(?), city_id=(?) WHERE id=(?)"),
+        READ("SELECT * FROM employee WHERE id = ?");
 
-        String query;
+        final String query;
 
         Queries(String query) {
             this.query = query;
