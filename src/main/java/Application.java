@@ -19,17 +19,17 @@ public class Application {
             EmployeeDao employeeDao = new EmployeeDaoImpl(connection);
 
             // Добавление объекта
-//            Employee pupkin = new Employee(8, "Viktor", "Arbuzov", "male", 25, 2);
-//            employeeDao.create(pupkin);
-//
-//            // Получение объекта по id
+            Employee pupkin = new Employee(8, "Viktor", "Arbuzov", "male", 25, 2);
+            employeeDao.create(pupkin);
+
+            // Получение объекта по id
             System.out.println(employeeDao.readById(3));
-//
+
             // Изменение объекта по id
-//            employeeDao.updateEmployeeById(5, "Dmitriy", "Petrov", "male", 33, 7);
+            employeeDao.updateEmployeeById(5, "Dmitriy", "Petrov", "male", 33, 7);
 
             // Удаление объекта по id
-//            employeeDao.deleteById(12);
+            employeeDao.deleteById(12);
 
             // Получение всех объектов
             List<Employee> employees = employeeDao.readAll();
