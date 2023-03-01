@@ -1,5 +1,8 @@
+import dao.CityDao;
+import dao.CityDaoImpl;
 import dao.EmployeeDao;
 import dao.EmployeeDaoImpl;
+import model.City;
 import model.Employee;
 
 import java.sql.*;
@@ -11,27 +14,20 @@ public class Application {
 
         // Создаём объект класса DAO
         EmployeeDao employeeDao = new EmployeeDaoImpl();
+        CityDao cityDao = new CityDaoImpl();
 
-        Employee empl1 = new Employee(11, "Fedor", "Emelianenko", "male", 45, 6);
-        // Создаём новый объект
+        City city1 = new City("Kishinev");
+        cityDao.create(city1);
+
+        Employee empl1 = new Employee("Oleg", "Markov", "Male", 39);
+        City city2 = cityDao.readById(7);
+        empl1.setCityId(city2);
         employeeDao.create(empl1);
 
-        // Получаем объект по id
-        System.out.println(employeeDao.readById(11));
+        City city3 = cityDao.readById(7);
+        cityDao.deleteEmployee(city3);
 
-        // Получаем полный список объектов
-        List<Employee> list = employeeDao.readAll();
-        for (Employee employee : list) {
-            System.out.println(employee);
-        }
-
-        Employee empl2 = new Employee(35,"Grisha", "Budkin", "male", 33, 2);
-
-        // Изменяем объект
-        employeeDao.updateEmployee(empl2);
-
-        // Удаляем объект
-        employeeDao.deleteEmployee(empl2);
+        System.out.println(cityDao.readAll());
     }
 }
 
